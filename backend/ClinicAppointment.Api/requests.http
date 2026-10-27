@@ -1,0 +1,39 @@
+@base = http://localhost:5050
+
+### Kiểm tra backend
+GET {{base}}/
+
+### GET tất cả
+GET {{base}}/api/appointments
+
+### POST (thay ngày bằng ngày tương lai trước khi thử)
+POST {{base}}/api/appointments
+Content-Type: application/json
+
+{
+  "patientName": "Nguyen Van A",
+  "phone": "0901234567",
+  "department": "Nội tổng quát",
+  "date": "2027-01-20",
+  "time": "08:00",
+  "note": "Du lieu gia lap cho bai thuc hanh"
+}
+
+### GET một lịch
+GET {{base}}/api/appointments/1
+
+### PUT cập nhật
+PUT {{base}}/api/appointments/1
+Content-Type: application/json
+
+{
+  "patientName": "Nguyen Van A",
+  "phone": "0901234567",
+  "department": "Nội tổng quát",
+  "date": "2027-01-20",
+  "time": "09:30",
+  "note": "Cap nhat ghi chu"
+}
+
+### DELETE
+DELETE {{base}}/api/appointments/1

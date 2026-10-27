@@ -5,6 +5,7 @@ const links = [
   { to: '/about-us', label: 'Giới thiệu' },
   { to: '/doctors', label: 'Bác sĩ' },
   { to: '/booking', label: 'Đăng ký khám' },
+  { to: '/appointments', label: 'Quản lý lịch' },
 ];
 
 export default function Header() {

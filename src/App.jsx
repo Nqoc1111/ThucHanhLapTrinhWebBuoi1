@@ -5,6 +5,7 @@ import Home from './pages/Home.jsx';
 import About from './pages/About.jsx';
 import Doctors from './pages/Doctors.jsx';
 import Booking from './pages/Booking.jsx';
+import Appointments from './pages/Appointments.jsx';
 import NotFound from './pages/NotFound.jsx';
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
           <Route path="/about-us" element={<About />} />
           <Route path="/doctors" element={<Doctors />} />
           <Route path="/booking" element={<Booking />} />
+          <Route path="/appointments" element={<Appointments />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
