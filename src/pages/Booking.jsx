@@ -116,7 +116,7 @@ export default function Booking() {
           <div className="step"><span>1</span><div><strong>Chọn chuyên khoa</strong><p>Xác định loại dịch vụ muốn đăng ký.</p></div></div>
           <div className="step"><span>2</span><div><strong>Chọn thời gian</strong><p>Điền ngày khám và khung giờ mong muốn.</p></div></div>
           <div className="step"><span>3</span><div><strong>Gửi thông tin</strong><p>Gửi biểu mẫu tới API Backend bằng Axios.</p></div></div>
-          <p className="side-note">Môi trường thực hành không có xác thực tài khoản. Chỉ sử dụng tên và số điện thoại giả lập, không nhập dữ liệu bệnh nhân thật.</p>
+          <p className="side-note">Bạn đã đăng nhập. Lịch mới được gắn với tài khoản hiện tại; chỉ dùng thông tin giả lập, không nhập dữ liệu bệnh nhân thật.</p>
           <Link to="/doctors" className="text-link">← Xem danh sách bác sĩ</Link>
         </aside>
       </div>

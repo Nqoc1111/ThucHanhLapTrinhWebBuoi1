@@ -1,4 +1,6 @@
-import { NavLink } from 'react-router';
+import { useState } from 'react';
+import { NavLink, useNavigate } from 'react-router';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const links = [
   { to: '/', label: 'Trang chủ', end: true },
@@ -9,6 +11,24 @@ const links = [
 ];
 
 export default function Header() {
+  const { user, loading, logout } = useAuth();
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  async function onLogout() {
+    setLoggingOut(true);
+    setError('');
+    try {
+      await logout();
+      navigate('/login', { replace: true });
+    } catch {
+      setError('Không thể đăng xuất. Kiểm tra kết nối Backend.');
+    } finally {
+      setLoggingOut(false);
+    }
+  }
+
   return (
     <header className="site-header">
       <div className="container header-inner">
@@ -18,17 +38,29 @@ export default function Header() {
         </NavLink>
         <nav aria-label="Điều hướng chính" className="nav-links">
           {links.map(({ to, label, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-            >
+            <NavLink key={to} to={to} end={end}
+              className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
               {label}
             </NavLink>
           ))}
         </nav>
+        <div className="auth-nav">
+          {loading ? <span className="auth-small">Kiểm tra phiên...</span> : user ? (
+            <>
+              <span className="auth-email" title={user.email}>{user.email}</span>
+              <button className="auth-logout" onClick={onLogout} disabled={loggingOut}>
+                {loggingOut ? 'Đang thoát...' : 'Đăng xuất'}
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink to="/login" className="nav-link">Đăng nhập</NavLink>
+              <NavLink to="/register" className="auth-register-link">Đăng ký</NavLink>
+            </>
+          )}
+        </div>
       </div>
+      {error && <div className="container auth-nav-error" role="alert">{error}</div>}
     </header>
   );
 }

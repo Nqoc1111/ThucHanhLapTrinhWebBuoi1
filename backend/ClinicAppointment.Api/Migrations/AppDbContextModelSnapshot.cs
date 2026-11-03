@@ -17,6 +17,35 @@ namespace ClinicAppointment.Api.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
 
+            modelBuilder.Entity("ClinicAppointment.Api.Models.AppUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NormalizedEmail")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("ClinicAppointment.Api.Models.Appointment", b =>
                 {
                     b.Property<int>("Id")
@@ -36,6 +65,9 @@ namespace ClinicAppointment.Api.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("OwnerUserId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("PatientName")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -54,7 +86,24 @@ namespace ClinicAppointment.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("OwnerUserId");
+
                     b.ToTable("Appointments");
+                });
+
+            modelBuilder.Entity("ClinicAppointment.Api.Models.Appointment", b =>
+                {
+                    b.HasOne("ClinicAppointment.Api.Models.AppUser", "OwnerUser")
+                        .WithMany("Appointments")
+                        .HasForeignKey("OwnerUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("OwnerUser");
+                });
+
+            modelBuilder.Entity("ClinicAppointment.Api.Models.AppUser", b =>
+                {
+                    b.Navigation("Appointments");
                 });
 #pragma warning restore 612, 618
         }

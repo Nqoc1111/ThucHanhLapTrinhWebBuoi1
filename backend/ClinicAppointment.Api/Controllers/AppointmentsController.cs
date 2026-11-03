@@ -1,70 +1,80 @@
+using System.Security.Claims;
 using ClinicAppointment.Api.Data;
 using ClinicAppointment.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClinicAppointment.Api.Controllers;
 
+// Chỉ user đã đăng nhập mới truy cập CRUD lịch khám.
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class AppointmentsController(AppDbContext db) : ControllerBase
 {
-    // GET /api/appointments
+    private int? CurrentUserId => int.TryParse(
+        User.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : null;
+
     [HttpGet]
     public async Task<ActionResult<List<Appointment>>> GetAll()
     {
-        var appointments = await db.Appointments.AsNoTracking()
-            .OrderByDescending(a => a.Id).ToListAsync();
-        return Ok(appointments);
+        if (CurrentUserId is not int userId) return Unauthorized();
+        var items = await db.Appointments.AsNoTracking()
+            .Where(a => a.OwnerUserId == userId) // Không lộ lịch của người khác.
+            .OrderByDescending(a => a.Id)
+            .ToListAsync();
+        return Ok(items.Select(ToResponse));
     }
 
-    // GET /api/appointments/1
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<Appointment>> GetById(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-        var appointment = await db.Appointments.AsNoTracking()
-            .FirstOrDefaultAsync(a => a.Id == id);
-        return appointment is null ? NotFound() : Ok(appointment);
+        if (CurrentUserId is not int userId) return Unauthorized();
+        var item = await db.Appointments.AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id == id && a.OwnerUserId == userId);
+        return item is null ? NotFound() : Ok(ToResponse(item));
     }
 
-    // POST /api/appointments
     [HttpPost]
-    public async Task<ActionResult<Appointment>> Create([FromBody] AppointmentRequest request)
+    public async Task<IActionResult> Create([FromBody] AppointmentRequest request)
     {
-        var dateError = ValidateRequest(request);
-        if (dateError is not null) return BadRequest(new { message = dateError });
+        if (CurrentUserId is not int userId) return Unauthorized();
+        var error = ValidateRequest(request);
+        if (error is not null) return BadRequest(new { message = error });
 
-        var appointment = new Appointment();
+        var appointment = new Appointment { OwnerUserId = userId };
         CopyInput(request, appointment);
         db.Appointments.Add(appointment);
         await db.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetById), new { id = appointment.Id }, appointment);
+        return CreatedAtAction(nameof(GetById), new { id = appointment.Id }, ToResponse(appointment));
     }
 
-    // PUT /api/appointments/1
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] AppointmentRequest request)
     {
-        var appointment = await db.Appointments.FindAsync(id);
-        if (appointment is null) return NotFound();
+        if (CurrentUserId is not int userId) return Unauthorized();
+        var item = await db.Appointments
+            .FirstOrDefaultAsync(a => a.Id == id && a.OwnerUserId == userId);
+        if (item is null) return NotFound();
 
-        var dateError = ValidateRequest(request);
-        if (dateError is not null) return BadRequest(new { message = dateError });
+        var error = ValidateRequest(request);
+        if (error is not null) return BadRequest(new { message = error });
 
-        CopyInput(request, appointment);
+        CopyInput(request, item);
         await db.SaveChangesAsync();
         return NoContent();
     }
 
-    // DELETE /api/appointments/1
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var appointment = await db.Appointments.FindAsync(id);
-        if (appointment is null) return NotFound();
+        if (CurrentUserId is not int userId) return Unauthorized();
+        var item = await db.Appointments
+            .FirstOrDefaultAsync(a => a.Id == id && a.OwnerUserId == userId);
+        if (item is null) return NotFound();
 
-        db.Appointments.Remove(appointment);
+        db.Appointments.Remove(item);
         await db.SaveChangesAsync();
         return NoContent();
     }
@@ -77,7 +87,6 @@ public class AppointmentsController(AppDbContext db) : ControllerBase
         string[] allowedDepartments = ["Nội tổng quát", "Nhi khoa", "Da liễu", "Tai Mũi Họng"];
         if (!allowedDepartments.Contains(request.Department))
             return "Chuyên khoa không hợp lệ";
-
         return null;
     }
 
@@ -90,4 +99,11 @@ public class AppointmentsController(AppDbContext db) : ControllerBase
         target.Time = source.Time;
         target.Note = source.Note?.Trim();
     }
+
+    // Trả DTO đơn giản, không serialize OwnerUser.PasswordHash.
+    private static object ToResponse(Appointment a) => new
+    {
+        a.Id, a.PatientName, a.Phone, a.Department, a.Date, a.Time,
+        a.Note, a.Status, a.CreatedAtUtc
+    };
 }

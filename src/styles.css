@@ -34,3 +34,26 @@
 .details-card dt{font-weight:700;color:#37566b}
 .details-card dd{margin:0;overflow-wrap:anywhere}
 @media(max-width:600px){.details-card dl{grid-template-columns:1fr;gap:4px}.details-card dd{margin-bottom:12px}}
+
+
+/* Tuần 3: giao diện đăng ký, đăng nhập và trạng thái user */
+.auth-page{max-width:750px}
+.auth-heading{text-align:center;margin-inline:auto}
+.auth-form{width:min(500px,100%);margin-inline:auto;display:flex;flex-direction:column;gap:11px}
+.auth-form label{font-size:13px;font-weight:700;color:#3b586c;margin-top:7px}
+.auth-form input{width:100%;padding:13px;border:1px solid #cadbe4;border-radius:9px;outline:none}
+.auth-form input:focus{border-color:#0b9893;box-shadow:0 0 0 3px #0b98931c}
+.auth-form .btn{margin-top:14px}
+.auth-form .success-notice{margin:0}
+.auth-alt{font-size:14px;text-align:center;margin:6px 0 0!important}
+.auth-disclaimer{font-size:12px;margin:0!important;color:#72899a}
+.auth-nav{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.auth-register-link,.auth-logout{padding:10px 13px;border-radius:9px;background:#0e9e99;color:#fff;font-size:13px;font-weight:700;border:0;white-space:nowrap}
+.auth-logout{background:#f0faf8;color:#0a817c;border:1px solid #c7e5de}
+.auth-register-link:hover,.auth-logout:hover{filter:brightness(.95)}
+.auth-email{font-size:12px;color:#476a77;max-width:165px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.auth-small{font-size:12px;color:#6c8491}
+.auth-nav-error,.auth-connection-error{color:#aa3434;font-size:13px;padding:8px}
+.auth-loading{padding-block:100px;text-align:center;color:#6b7e91}
+@media(max-width:1200px){.header-inner{flex-wrap:wrap;justify-content:center;padding-block:15px}}
+@media(max-width:700px){.auth-nav{justify-content:center}.auth-email{max-width:130px}.auth-form{padding:24px}}

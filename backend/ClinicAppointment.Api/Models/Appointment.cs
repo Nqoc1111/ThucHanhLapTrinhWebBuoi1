@@ -11,4 +11,8 @@ public class Appointment
     public string? Note { get; set; }
     public string Status { get; set; } = "Pending";
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+
+    // Nullable để giữ nguyên các bản ghi tuần 2; bản ghi mới luôn gắn user đăng nhập.
+    public int? OwnerUserId { get; set; }
+    public AppUser? OwnerUser { get; set; }
 }
